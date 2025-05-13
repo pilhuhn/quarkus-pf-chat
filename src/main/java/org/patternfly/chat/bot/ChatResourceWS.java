@@ -20,21 +20,17 @@ import java.util.Map;
 public class ChatResourceWS {
 
 
-    private final MyChatService bot;
+    private final MyChatServiceWS bot;
 
-    public ChatResourceWS(MyChatService bot) {
+    public ChatResourceWS(MyChatServiceWS bot) {
         this.bot = bot;
     }
 
     @OnOpen
     // TODO skip for now as the frontend produces a garbled item if we send this
-    public Map<String,String> onOpen(WebSocketConnection conn) {
+    public String onOpen(WebSocketConnection conn) {
         System.out.println("ws open ");
         return null;
-//        Map<String,String> out = new HashMap<>();
-//        out.put("event","message");
-//        out.put("message", "Hello, how can I help you?");
-//        return out;
     }
 
     @OnClose
@@ -43,43 +39,16 @@ public class ChatResourceWS {
     }
 
     @OnTextMessage
-    public Map<String,String> onMessage(WebSocketConnection conn, String query) {
+    public Multi<String> onMessage(WebSocketConnection conn, String query) {
         System.out.println("WS: got : " + query);
-        String eventType;
         JsonObject jsonObject;
 
-        Map<String,String> out = new HashMap<>();
-        out.put("event","message");
 
+        Multi<String> result;
 
-        try {
-            jsonObject = Json.createReader(new StringReader(query)).readObject();
-            eventType = jsonObject.get("event").toString();
-        } catch (Exception e) {
-            out.put("data","!E " + e.getMessage());
-            return out;
-        }
-        if ("\"subscribe\"".equals(eventType)) {
-            out.put("data", "Hello, nice to meet you");
-            return out;
-        }
+        result= bot.patternFlyInfo(query);
 
-        if ("unsubscribe".equals(eventType)) {
-            System.out.println(conn.close());
-            return null;
-        }
-
-        String msg = jsonObject.get("data").toString();
-        msg = msg.strip();
-
-        String topic = msg != null && !msg.isEmpty() ? msg : "PatternFly";
-
-        String result = bot.patternFlyInfo(topic);
-        // String result = "this is a demo result for . _" +topic + "_ " + new Date().toString();
-
-        out.put("data",result);
-
-        return out;
+        return result;
     }
 
 }

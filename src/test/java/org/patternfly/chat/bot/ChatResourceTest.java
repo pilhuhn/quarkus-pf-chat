@@ -10,22 +10,21 @@ import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 class ChatResourceTest {
+
     @Test
-    @Order(2)
-    void testHelloEndpoint() {
+    void firstUpload() {
+        given()
+                .when().get("/upload?url=https://quarkus.io")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    void thenHelloEndpoint() {
         given()
           .when().get("/hello?q=quarkus%20version")
           .then()
              .statusCode(200)
                 .body(containsString("Quarkus"));
-    }
-
-    @Test
-    @Order(1)
-    void testUpload() {
-        given()
-                .when().get("/upload?url=https://quarkus.io")
-                .then()
-                .statusCode(200);
     }
 }

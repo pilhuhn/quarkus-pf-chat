@@ -19,17 +19,19 @@ package org.patternfly.chat.bot;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import io.quarkiverse.langchain4j.RegisterAiService;
+import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.SessionScoped;
 
 /**
  * @author hrupp
  */
+@SessionScoped //  WS wants this session scoped
 @RegisterAiService(modelName = "model1")
-public interface MyChatService {
+public interface MyChatServiceWS {
     @SystemMessage("You are a helpful and polite assistant. When replying with code, please format it as Markdown.")
         @UserMessage(
 """
 Please provide Info about {topic} (in the context of PatternFly).
 """)
-    String patternFlyInfo(String topic);
+    Multi<String> patternFlyInfo(String topic);
 }
